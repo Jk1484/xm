@@ -2,7 +2,6 @@ package configs
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 
 	"go.uber.org/fx"
@@ -44,7 +43,6 @@ func (c *configs) Peek() *configs {
 }
 
 func readFile() *configs {
-	fmt.Println(os.Getwd())
 	f, err := os.Open("configs/configs.json")
 	if err != nil {
 		panic(err)
