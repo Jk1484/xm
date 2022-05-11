@@ -25,7 +25,7 @@ import (
 )
 
 func TestCreateCompany(t *testing.T) {
-	h, m := getTestHandler(t)
+	h, m := getTestHandlerCompany(t)
 
 	tests := []struct {
 		name     string
@@ -129,7 +129,7 @@ func TestCreateCompany(t *testing.T) {
 }
 
 func TestGetCompanyByID(t *testing.T) {
-	h, m := getTestHandler(t)
+	h, m := getTestHandlerCompany(t)
 
 	tests := []struct {
 		name   string
@@ -196,7 +196,7 @@ func TestGetCompanyByID(t *testing.T) {
 }
 
 func TestGetAllCompanies(t *testing.T) {
-	h, m := getTestHandler(t)
+	h, m := getTestHandlerCompany(t)
 
 	tests := []struct {
 		name    string
@@ -259,7 +259,7 @@ func TestGetAllCompanies(t *testing.T) {
 }
 
 func TestDeleteCompany(t *testing.T) {
-	h, m := getTestHandler(t)
+	h, m := getTestHandlerCompany(t)
 
 	tests := []struct {
 		name    string
@@ -317,7 +317,7 @@ func TestDeleteCompany(t *testing.T) {
 }
 
 func TestUpdateCompany(t *testing.T) {
-	h, m := getTestHandler(t)
+	h, m := getTestHandlerCompany(t)
 
 	tests := []struct {
 		name   string
@@ -368,9 +368,9 @@ func TestUpdateCompany(t *testing.T) {
 	}
 }
 
-func getTestHandler(t *testing.T) (handlers.Handlers, *mocker) {
+func getTestHandlerCompany(t *testing.T) (handlers.Handlers, *companyMocker) {
 	var h handlers.Handlers
-	m := &mocker{}
+	m := &companyMocker{}
 
 	go fxtest.New(
 		fxtest.TB(t),
@@ -394,33 +394,33 @@ func getTestHandler(t *testing.T) (handlers.Handlers, *mocker) {
 	return h, m
 }
 
-type mocker struct {
+type companyMocker struct {
 	mock.Mock
 }
 
-func (m *mocker) Create(c company.Company) (err error) {
+func (m *companyMocker) Create(c company.Company) (err error) {
 	args := m.Called(c)
 	return args.Error(0)
 }
 
-func (m *mocker) GetByID(id int) (c company.Company, err error) {
+func (m *companyMocker) GetByID(id int) (c company.Company, err error) {
 	args := m.Called(id)
 	return args.Get(0).(company.Company), args.Error(1)
 }
 
-func (m *mocker) GetAll(f company.Filters) (companies []company.Company, err error) {
+func (m *companyMocker) GetAll(f company.Filters) (companies []company.Company, err error) {
 	args := m.Called(f)
 	companies, _ = args.Get(0).([]company.Company)
 
 	return companies, args.Error(1)
 }
 
-func (m *mocker) Update(c company.Company) (err error) {
+func (m *companyMocker) Update(c company.Company) (err error) {
 	args := m.Called(c)
 	return args.Error(0)
 }
 
-func (m *mocker) DeleteByID(id int) (err error) {
+func (m *companyMocker) DeleteByID(id int) (err error) {
 	args := m.Called(id)
 	return args.Error(0)
 }
