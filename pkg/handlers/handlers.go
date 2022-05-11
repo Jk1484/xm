@@ -3,6 +3,7 @@ package handlers
 import (
 	"xm/pkg/logger"
 	userRepository "xm/pkg/repositories/user"
+	"xm/pkg/services/company"
 	userService "xm/pkg/services/user"
 
 	"encoding/json"
@@ -22,23 +23,32 @@ type Handlers interface {
 	SignIn(w http.ResponseWriter, r *http.Request)
 	Middleware(next http.Handler) http.Handler
 	LogRequest(next http.Handler) http.Handler
+
+	CreateCompany(w http.ResponseWriter, r *http.Request)
+	GetCompanyByID(w http.ResponseWriter, r *http.Request)
+	GetAllCompanies(w http.ResponseWriter, r *http.Request)
+	UpdateCompany(w http.ResponseWriter, r *http.Request)
+	DeleteCompany(w http.ResponseWriter, r *http.Request)
 }
 
 type handlers struct {
-	userService userService.Service
-	logger      logger.Logger
+	userService    userService.Service
+	companyService company.Service
+	logger         logger.Logger
 }
 
 type Params struct {
 	fx.In
-	UserService userService.Service
-	Logger      logger.Logger
+	UserService    userService.Service
+	CompanyService company.Service
+	Logger         logger.Logger
 }
 
 func New(p Params) Handlers {
 	return &handlers{
-		userService: p.UserService,
-		logger:      p.Logger,
+		userService:    p.UserService,
+		companyService: p.CompanyService,
+		logger:         p.Logger,
 	}
 }
 

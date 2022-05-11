@@ -63,12 +63,12 @@ func (r *repository) Create(c Company) (err error) {
 func (r *repository) GetByID(id int) (c Company, err error) {
 	query := `
 		SELECT
-			id, name, code, country, website, phone
+			id, name, code, country, website, phone, status, created_at, updated_at
 		FROM companies
 		WHERE id = $1 AND status = 'active'
 	`
 
-	err = r.db.QueryRow(query, id).Scan(&c.ID, &c.Name, &c.Country, &c.Website, &c.Phone)
+	err = r.db.QueryRow(query, id).Scan(&c.ID, &c.Name, &c.Code, &c.Country, &c.Website, &c.Phone, &c.Status, &c.CreatedAt, &c.UpdatedAt)
 	if err != nil {
 		return
 	}
@@ -90,9 +90,9 @@ type Filters struct {
 func (r *repository) GetAll(f Filters) (companies []Company, err error) {
 	query := `
 		SELECT
-			id, name, code, country, website, phone
+			id, name, code, country, website, phone, status, created_at, updated_at
 		FROM companies
-		WHERE 1 = 1
+		WHERE status = 'active'
 	`
 
 	cnt := 1
@@ -155,12 +155,16 @@ func (r *repository) GetAll(f Filters) (companies []Company, err error) {
 
 	for rows.Next() {
 		var c Company
-		err = rows.Scan(&c.ID, &c.Name, &c.Country, &c.Website, &c.Phone)
+		err = rows.Scan(&c.ID, &c.Name, &c.Code, &c.Country, &c.Website, &c.Phone, &c.Status, &c.CreatedAt, &c.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
 
 		companies = append(companies, c)
+	}
+
+	if len(companies) == 0 {
+		return nil, sql.ErrNoRows
 	}
 
 	return
@@ -170,13 +174,13 @@ func (r *repository) Update(c Company) (err error) {
 	query := `
 		UPDATE companies
 		SET
-			name = COALESCE($1, name), code = COALESCE($2, code),
-			country = COALESCE($3, country), website = COALESCE($4, website),
-			phone = COALESCE($5, phone)
+			name = COALESCE(NULLIF($1, ''), name), code = COALESCE(NULLIF($2, ''), code),
+			country = COALESCE(NULLIF($3, ''), country), website = COALESCE(NULLIF($4, ''), website),
+			phone = COALESCE(NULLIF($5, ''), phone)
 		WHERE id = $6
 	`
 
-	_, err = r.db.Exec(query, c.Name, c.Code, c.Country, c.Website, c.Phone)
+	_, err = r.db.Exec(query, c.Name, c.Code, c.Country, c.Website, c.Phone, c.ID)
 	if err != nil {
 		return
 	}
@@ -188,12 +192,21 @@ func (r *repository) DeleteByID(id int) (err error) {
 	query := `
 		UPDATE companies
 		SET status = 'deleted'
-		WHERE id = $1
+		WHERE id = $1 AND status != 'deleted'
 	`
 
-	_, err = r.db.Exec(query, id)
+	res, err := r.db.Exec(query, id)
 	if err != nil {
 		return
+	}
+
+	cnt, err := res.RowsAffected()
+	if err != nil {
+		return
+	}
+
+	if cnt == 0 {
+		return sql.ErrNoRows
 	}
 
 	return

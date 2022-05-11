@@ -1,7 +1,9 @@
 package company
 
 import (
+	"database/sql"
 	"xm/pkg/repositories/company"
+	"xm/pkg/services/utils"
 
 	"go.uber.org/fx"
 )
@@ -32,21 +34,48 @@ func New(p Params) Service {
 }
 
 func (s *service) Create(c company.Company) (err error) {
-	return
+	return s.companyRepository.Create(c)
 }
 
 func (s *service) GetByID(id int) (c company.Company, err error) {
+	c, err = s.companyRepository.GetByID(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return company.Company{}, utils.ErrNotFound
+		}
+
+		return
+	}
+
 	return
 }
 
 func (s *service) GetAll(f company.Filters) (companies []company.Company, err error) {
+	companies, err = s.companyRepository.GetAll(f)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, utils.ErrNotFound
+		}
+
+		return
+	}
+
 	return
 }
 
 func (s *service) Update(c company.Company) (err error) {
-	return
+	return s.companyRepository.Update(c)
 }
 
 func (s *service) DeleteByID(id int) (err error) {
+	err = s.companyRepository.DeleteByID(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return utils.ErrNotFound
+		}
+
+		return
+	}
+
 	return
 }
