@@ -27,7 +27,7 @@ func Init(p Params) {
 	mux.Handle("/company", p.Handlers.LogRequest(p.Handlers.Middleware(http.HandlerFunc(p.Handlers.GetCompanyByID)))).Methods("GET")
 	mux.Handle("/company", p.Handlers.LogRequest(p.Handlers.Middleware(http.HandlerFunc(p.Handlers.DeleteCompany)))).Methods("DELETE")
 	mux.Handle("/companies", p.Handlers.LogRequest(p.Handlers.Middleware(http.HandlerFunc(p.Handlers.GetAllCompanies)))).Methods("POST")
-	mux.Handle("/company/update", p.Handlers.LogRequest(p.Handlers.Middleware(http.HandlerFunc(p.Handlers.UpdateCompany)))).Methods("POST")
+	mux.Handle("/company/update", p.Handlers.LogRequest(p.Handlers.Middleware(http.HandlerFunc(p.Handlers.UpdateCompany)))).Methods("PATCH")
 
 	server := http.Server{
 		Addr:    ":8080",
