@@ -16,36 +16,7 @@ import (
 )
 
 func TestCreate(t *testing.T) {
-	var repo user.Repository
-	var dbConn *sql.DB
-
-	go fxtest.New(
-		fxtest.TB(t),
-		fx.Options(
-			configs.Module,
-			logger.Module,
-
-			fx.Provide(
-				func(
-					p struct {
-						fx.In
-						Configs configs.Configs
-					},
-				) db.Database {
-					dbConn = prepare(p.Configs)
-
-					return &mock{
-						db: dbConn,
-					}
-				},
-			),
-
-			repositories.Module,
-		),
-		fx.Populate(&repo),
-	).Run()
-
-	err := createUsersTable(dbConn)
+	repo, err := getTestRepo(t)
 	require.NoError(t, err)
 
 	var u = user.User{
@@ -64,36 +35,7 @@ func TestCreate(t *testing.T) {
 }
 
 func TestGetByUsername(t *testing.T) {
-	var repo user.Repository
-	var dbConn *sql.DB
-
-	go fxtest.New(
-		fxtest.TB(t),
-		fx.Options(
-			configs.Module,
-			logger.Module,
-
-			fx.Provide(
-				func(
-					p struct {
-						fx.In
-						Configs configs.Configs
-					},
-				) db.Database {
-					dbConn = prepare(p.Configs)
-
-					return &mock{
-						db: dbConn,
-					}
-				},
-			),
-
-			repositories.Module,
-		),
-		fx.Populate(&repo),
-	).Run()
-
-	err := createUsersTable(dbConn)
+	repo, err := getTestRepo(t)
 	require.NoError(t, err)
 
 	var u = user.User{
@@ -113,6 +55,40 @@ func TestGetByUsername(t *testing.T) {
 	u2, err := repo.GetByUsername(u.Username)
 	require.NoError(t, err)
 	require.Equal(t, u.Password, u2.Password)
+}
+
+func getTestRepo(t *testing.T) (user.Repository, error) {
+	var repo user.Repository
+	var dbConn *sql.DB
+
+	go fxtest.New(
+		fxtest.TB(t),
+		fx.Options(
+			configs.Module,
+			logger.Module,
+
+			fx.Provide(
+				func(
+					p struct {
+						fx.In
+						Configs configs.Configs
+					},
+				) db.Database {
+					dbConn = prepare(p.Configs)
+
+					return &mock{
+						db: dbConn,
+					}
+				},
+			),
+
+			repositories.Module,
+		),
+		fx.Populate(&repo),
+	).Run()
+
+	err := createUsersTable(dbConn)
+	return repo, err
 }
 
 func prepare(cfg configs.Configs) *sql.DB {
