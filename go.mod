@@ -9,11 +9,14 @@ require (
 	github.com/stretchr/testify v1.7.1
 	go.uber.org/fx v1.17.1
 	go.uber.org/zap v1.16.0
-	golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529
+	golang.org/x/crypto v0.0.0-20210314154223-e6e6c4f2bb5b
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/nats-io/nats.go v1.15.0 // indirect
+	github.com/nats-io/nkeys v0.3.0 // indirect
+	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.1.0 // indirect
 	go.uber.org/atomic v1.6.0 // indirect

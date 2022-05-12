@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 	"xm/configs"
+	"xm/gateways"
 	"xm/pkg/db"
 	"xm/pkg/handlers"
 	"xm/pkg/logger"
@@ -185,6 +186,7 @@ func getTestHandler(t *testing.T) (handlers.Handlers, *userMocker) {
 			handlers.Module,
 			repositories.Module,
 			db.Module,
+			gateways.Module,
 
 			company.Module,
 			fx.Provide(

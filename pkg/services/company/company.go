@@ -2,6 +2,9 @@ package company
 
 import (
 	"database/sql"
+	"encoding/json"
+	"strconv"
+	"xm/gateways/nats"
 	"xm/pkg/repositories/company"
 	"xm/pkg/services/utils"
 
@@ -20,16 +23,19 @@ type Service interface {
 
 type service struct {
 	companyRepository company.Repository
+	natsGateway       nats.Gateway
 }
 
 type Params struct {
 	fx.In
 	CompanyRepository company.Repository
+	NATSGateway       nats.Gateway
 }
 
 func New(p Params) Service {
 	return &service{
 		companyRepository: p.CompanyRepository,
+		natsGateway:       p.NATSGateway,
 	}
 }
 
@@ -64,7 +70,15 @@ func (s *service) GetAll(f company.Filters) (companies []company.Company, err er
 }
 
 func (s *service) Update(c company.Company) (err error) {
-	return s.companyRepository.Update(c)
+	err = s.companyRepository.Update(c)
+	if err != nil {
+		return
+	}
+
+	m, _ := json.Marshal(c)
+	s.natsGateway.GetConnection().Publish("company_update", m)
+
+	return
 }
 
 func (s *service) DeleteByID(id int) (err error) {
@@ -76,6 +90,8 @@ func (s *service) DeleteByID(id int) (err error) {
 
 		return
 	}
+
+	s.natsGateway.GetConnection().Publish("company_delete", []byte(strconv.Itoa(id)))
 
 	return
 }

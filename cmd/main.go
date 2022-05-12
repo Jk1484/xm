@@ -2,6 +2,7 @@ package main
 
 import (
 	"xm/configs"
+	"xm/gateways"
 	"xm/pkg/db"
 	"xm/pkg/handlers"
 	"xm/pkg/handlers/server"
@@ -22,6 +23,7 @@ func main() {
 			services.Module,
 			handlers.Module,
 			server.Module,
+			gateways.Module,
 		),
 	).Run()
 }

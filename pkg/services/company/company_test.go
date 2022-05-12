@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"testing"
 	"xm/configs"
+	"xm/gateways"
 	"xm/pkg/logger"
 	"xm/pkg/services"
 	"xm/pkg/services/company"
@@ -100,6 +101,7 @@ func getTestService(t *testing.T) (company.Service, *mocker) {
 		fx.Options(
 			configs.Module,
 			logger.Module,
+			gateways.Module,
 
 			fx.Provide(
 				func() companyRepo.Repository {
