@@ -72,7 +72,7 @@ func TestSignUp(t *testing.T) {
 		{
 			name:     "internal err",
 			data:     `{"username": "someuser", "password": "somepass"}`,
-			expected: `{"code":500,"message":"Internal Server Error","payload":"some error"}`,
+			expected: `{"code":500,"message":"Internal Server Error","payload":null}`,
 			status:   500,
 			err:      errors.New("some error"),
 		},

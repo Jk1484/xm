@@ -98,7 +98,8 @@ func (h *handlers) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), err.Error())
+		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), nil)
+		h.logger.Logger().Error(err)
 		return
 	}
 
@@ -128,7 +129,8 @@ func (h *handlers) SignIn(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), err.Error())
+		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), nil)
+		h.logger.Logger().Error(err)
 		return
 	}
 
@@ -151,7 +153,8 @@ func (h *handlers) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), err.Error())
+		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), nil)
+		h.logger.Logger().Error(err)
 		return
 	}
 

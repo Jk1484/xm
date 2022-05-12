@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"xm/pkg/repositories/company"
@@ -19,34 +20,16 @@ func (h *handlers) CreateCompany(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if c.Name == "" {
-		apiResp.Set(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), "no name provided")
-		return
-	}
-
-	if c.Code == "" {
-		apiResp.Set(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), "no code provided")
-		return
-	}
-
-	if c.Country == "" {
-		apiResp.Set(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), "no country provided")
-		return
-	}
-
-	if c.Website == "" {
-		apiResp.Set(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), "no website provided")
-		return
-	}
-
-	if c.Phone == "" {
-		apiResp.Set(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), "no phone provided")
+	err = validate(c)
+	if err != nil {
+		apiResp.Set(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), err.Error())
 		return
 	}
 
 	err = h.companyService.Create(c)
 	if err != nil {
-		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), err.Error())
+		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), nil)
+		h.logger.Logger().Error(err)
 		return
 	}
 
@@ -71,7 +54,8 @@ func (h *handlers) GetCompanyByID(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), err.Error())
+		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), nil)
+		h.logger.Logger().Error(err)
 		return
 	}
 
@@ -96,7 +80,8 @@ func (h *handlers) GetAllCompanies(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), err.Error())
+		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), nil)
+		h.logger.Logger().Error(err)
 		return
 	}
 
@@ -116,7 +101,8 @@ func (h *handlers) UpdateCompany(w http.ResponseWriter, r *http.Request) {
 
 	err = h.companyService.Update(c)
 	if err != nil {
-		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), err.Error())
+		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), nil)
+		h.logger.Logger().Error(err)
 		return
 	}
 
@@ -141,9 +127,34 @@ func (h *handlers) DeleteCompany(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), err.Error())
+		apiResp.Set(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), nil)
+		h.logger.Logger().Error(err)
 		return
 	}
 
 	apiResp.Set(http.StatusOK, http.StatusText(http.StatusOK), "deleted")
+}
+
+func validate(c company.Company) error {
+	if c.Name == "" {
+		return errors.New("no name provided")
+	}
+
+	if c.Code == "" {
+		return errors.New("no code provided")
+	}
+
+	if c.Country == "" {
+		return errors.New("no country provided")
+	}
+
+	if c.Website == "" {
+		return errors.New("no website provided")
+	}
+
+	if c.Phone == "" {
+		return errors.New("no phone provided")
+	}
+
+	return nil
 }

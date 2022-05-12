@@ -20,9 +20,16 @@ type Params struct {
 }
 
 func New(p Params) Logger {
-	l, _ := zap.NewProduction()
+	cfg := zap.NewProductionConfig()
+	cfg.OutputPaths = []string{
+		"xm.log",
+	}
+	cfg.DisableStacktrace = true
+	l, _ := cfg.Build()
+	sl := l.Sugar()
+
 	return &logger{
-		logger: l.Sugar(),
+		logger: sl,
 	}
 }
 
