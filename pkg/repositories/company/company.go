@@ -171,6 +171,11 @@ func (r *repository) GetAll(f Filters) (companies []Company, err error) {
 }
 
 func (r *repository) Update(c Company) (err error) {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return
+	}
+
 	query := `
 		UPDATE companies
 		SET
@@ -180,34 +185,43 @@ func (r *repository) Update(c Company) (err error) {
 		WHERE id = $6
 	`
 
-	_, err = r.db.Exec(query, c.Name, c.Code, c.Country, c.Website, c.Phone, c.ID)
+	_, err = tx.Exec(query, c.Name, c.Code, c.Country, c.Website, c.Phone, c.ID)
+	if err != nil {
+		_ = tx.Rollback()
+		return
+	}
+
+	return tx.Commit()
+}
+
+func (r *repository) DeleteByID(id int) (err error) {
+	tx, err := r.db.Begin()
 	if err != nil {
 		return
 	}
 
-	return
-}
-
-func (r *repository) DeleteByID(id int) (err error) {
 	query := `
 		UPDATE companies
 		SET status = 'deleted'
 		WHERE id = $1 AND status != 'deleted'
 	`
 
-	res, err := r.db.Exec(query, id)
+	res, err := tx.Exec(query, id)
 	if err != nil {
+		_ = tx.Rollback()
 		return
 	}
 
 	cnt, err := res.RowsAffected()
 	if err != nil {
+		_ = tx.Rollback()
 		return
 	}
 
 	if cnt == 0 {
+		_ = tx.Rollback()
 		return sql.ErrNoRows
 	}
 
-	return
+	return tx.Commit()
 }
