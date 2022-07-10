@@ -165,7 +165,7 @@ func getTestRepo(t *testing.T) (company.Repository, error) {
 
 func prepare(cfg configs.Configs) *sql.DB {
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=testdb sslmode=disable",
-		cfg.Peek().Database.Host, cfg.Peek().Database.Port, cfg.Peek().Database.User, cfg.Peek().Database.Password)
+		"testdb", "5432", cfg.Peek().Database.User, cfg.Peek().Database.Password)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)

@@ -16,7 +16,7 @@ type gateway struct {
 }
 
 func New() Gateway {
-	nc, err := nats.Connect(nats.DefaultURL)
+	nc, err := nats.Connect("nats://nats-server:4222")
 	if err != nil {
 		panic(err)
 	}

@@ -30,7 +30,7 @@ func Init(p Params) {
 	mux.Handle("/company/update", p.Handlers.LogRequest(p.Handlers.Middleware(http.HandlerFunc(p.Handlers.UpdateCompany)))).Methods("PATCH")
 
 	server := http.Server{
-		Addr:    ":8080",
+		Addr:    ":8081",
 		Handler: mux,
 	}
 
